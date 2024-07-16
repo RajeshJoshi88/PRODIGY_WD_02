@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stopwatch Web Application</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .stopwatch {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .time {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .buttons button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 5px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+        }
+
+        .start {
+            background-color: #28a745;
+        }
+
+        .pause {
+            background-color: #ffc107;
+        }
+
+        .reset {
+            background-color: #dc3545;
+        }
+
+        .lap {
+            background-color: #007bff;
+        }
+
+        .laps {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            border-top: 1px solid #ddd;
+        }
+
+        .lap-time {
+            font-size: 18px;
+            margin: 5px 0;
+            padding: 5px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="stopwatch">
+        <div class="time" id="display">00:00:00.000</div>
+        <div class="buttons">
+            <button class="start" id="start">Start</button>
+            <button class="pause" id="pause">Pause</button>
+            <button class="reset" id="reset">Reset</button>
+            <button class="lap" id="lap">Lap</button>
+        </div>
+        <div class="laps" id="laps"></div>
+    </div>
+    <script>
+        let startTime = 0;
+        let elapsedTime = 0;
+        let timerInterval;
+        const display = document.getElementById('display');
+        const lapsContainer = document.getElementById('laps');
+
+        function timeToString(time) {
+            let diffInHrs = time / 3600000;
+            let hh = Math.floor(diffInHrs);
+
+            let diffInMin = (diffInHrs - hh) * 60;
+            let mm = Math.floor(diffInMin);
+
+            let diffInSec = (diffInMin - mm) * 60;
+            let ss = Math.floor(diffInSec);
+
+            let diffInMs = (diffInSec - ss) * 1000;
+            let ms = Math.floor(diffInMs);
+
+            let formattedHH = hh.toString().padStart(2, '0');
+            let formattedMM = mm.toString().padStart(2, '0');
+            let formattedSS = ss.toString().padStart(2, '0');
+            let formattedMS = ms.toString().padStart(3, '0');
+
+            return `${formattedHH}:${formattedMM}:${formattedSS}.${formattedMS}`;
+        }
+
+        function start() {
+            startTime = Date.now() - elapsedTime;
+            timerInterval = setInterval(function printTime() {
+                elapsedTime = Date.now() - startTime;
+                display.innerHTML = timeToString(elapsedTime);
+            }, 10);
+            showButton('PAUSE');
+        }
+
+        function pause() {
+            clearInterval(timerInterval);
+            showButton('PLAY');
+        }
+
+        function reset() {
+            clearInterval(timerInterval);
+            display.innerHTML = "00:00:00.000";
+            elapsedTime = 0;
+            lapsContainer.innerHTML = '';
+            showButton('PLAY');
+        }
+
+        function lap() {
+            let lapTime = timeToString(elapsedTime);
+            let lapElement = document.createElement('div');
+            lapElement.className = 'lap-time';
+            lapElement.innerHTML = lapTime;
+            lapsContainer.appendChild(lapElement);
+        }
+
+        function showButton(buttonKey) {
+            const playButton = document.getElementById('start');
+            const pauseButton = document.getElementById('pause');
+
+            if (buttonKey === 'PLAY') {
+                playButton.style.display = 'inline-block';
+                pauseButton.style.display = 'none';
+            } else {
+                playButton.style.display = 'none';
+                pauseButton.style.display = 'inline-block';
+            }
+        }
+
+        document.getElementById('start').addEventListener('click', start);
+        document.getElementById('pause').addEventListener('click', pause);
+        document.getElementById('reset').addEventListener('click', reset);
+        document.getElementById('lap').addEventListener('click', lap);
+
+        showButton('PLAY');
+    </script>
+</body>
+</html>
